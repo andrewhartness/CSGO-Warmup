@@ -4,18 +4,29 @@ import java.awt.Canvas;
 import java.awt.Graphics;
 import java.awt.image.BufferStrategy;
 
+import com.personal.app.andrew.entities.ClickPoint;
+import com.personal.app.andrew.entities.StartPoint;
+
 public class Game extends Canvas implements Runnable{
 
 	private static final long serialVersionUID = 2205314001445989053L;
 	
+	// Game Window Aspect Ratio
 	public static final int WIDTH = 1280;
 	public static final int HEIGHT = 800;
 	
 	private Thread thread;  //Single threaded
 	private boolean running;
 	
+	private Handler handler;
+	
 	public Game() {
 		new Window(WIDTH, HEIGHT, "CSGO Warmup", this);
+		
+		handler = new Handler(this);
+		handler.addEntity(new StartPoint(WIDTH/2, HEIGHT/2, ID.StartPoint));
+		handler.addEntity(new ClickPoint(WIDTH/2, HEIGHT/2, ID.ClickPoint));
+
 	}
 	
 	public void start() {
@@ -51,7 +62,7 @@ public class Game extends Canvas implements Runnable{
 			delta += (now - lastTime) / ns;
 			lastTime = now;
 			while(delta >= 1) {
-				tick();
+				update();
 				delta--;
 			}
 			if(running)	render();
@@ -66,8 +77,8 @@ public class Game extends Canvas implements Runnable{
 		stop();
 	}
 	
-	private void tick() {
-		
+	private void update() {
+		handler.update();
 	}
 	
 	private void render() {
@@ -80,6 +91,9 @@ public class Game extends Canvas implements Runnable{
 		Graphics g = bs.getDrawGraphics();
 		
 		g.fillRect(0, 0, WIDTH, HEIGHT);
+		
+		handler.render(g);
+		
 		g.dispose();
 		bs.show();
 	}
